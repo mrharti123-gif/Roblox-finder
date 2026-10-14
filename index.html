@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roblox ID Finder</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0d14;--panel:#151925;--line:#292f40;--text:#f5f7ff;--muted:#9ba4b8;--red:#ff4057;--red2:#ff6b4a}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(ellipse at top,#25203b 0,#0b0d14 58%);color:var(--text);display:grid;place-items:center;padding:24px}
+.wrap{width:min(100%,560px)}
+.brand{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:22px;font-weight:900;letter-spacing:1px;font-size:14px;color:#d9deed}
+.logo{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--red),var(--red2));font-size:19px;box-shadow:0 8px 28px #ff405733}
+h1{text-align:center;font-size:clamp(30px,7vw,43px);line-height:1.05;margin:0 0 12px;letter-spacing:-1.7px}
+h1 span{color:#ff596d}
+.subtitle{text-align:center;color:var(--muted);line-height:1.55;margin:0 auto 27px;max-width:410px;font-size:14px}
+.panel{background:#121621eF;border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 24px 80px #0006;backdrop-filter:blur(12px)}
+label{display:block;font-size:12px;font-weight:800;letter-spacing:.7px;color:#cbd1e1;margin-bottom:9px;text-transform:uppercase}
+.searchrow{display:flex;gap:9px}
+input{min-width:0;flex:1;background:#0b0e16;border:1px solid #343b4e;border-radius:12px;padding:15px 14px;color:var(--text);font:inherit;outline:none}
+input:focus{border-color:#ff596d;box-shadow:0 0 0 3px #ff596d20}
+button{border:0;border-radius:12px;padding:0 18px;background:linear-gradient(135deg,var(--red),var(--red2));color:white;font-weight:850;font:inherit;cursor:pointer;transition:transform .15s,opacity .15s}
+button:hover{transform:translateY(-1px)}button:disabled{opacity:.6;cursor:wait;transform:none}
+.hint{font-size:12px;color:#818ba2;margin:10px 2px 0}
+.status{display:none;margin-top:16px;padding:12px 13px;border-radius:11px;background:#1b2030;color:#d6dbee;font-size:13px;line-height:1.45}
+.status.show{display:block}.status.error{background:#361b25;color:#ffb7c1}
+.result{display:none;margin-top:20px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#0e111a}
+.result.show{display:block}
+.resulttop{padding:24px 20px 18px;text-align:center;background:radial-gradient(ellipse at top,#30223b,#111521 70%)}
+.avatar{width:150px;height:150px;object-fit:contain;border-radius:20px;background:#1a2030;border:1px solid #41475b;box-shadow:0 12px 35px #0007}
+.displayname{font-size:24px;font-weight:900;margin:15px 0 4px;overflow-wrap:anywhere}
+.username{font-size:14px;color:#aab3c7;margin:0;overflow-wrap:anywhere}
+.pill{display:inline-block;margin-top:12px;padding:5px 9px;border:1px solid #3a4053;border-radius:999px;font-size:10px;letter-spacing:1px;color:#c3cadd;font-weight:800}
+.details{padding:18px 20px;display:grid;gap:12px}
+.detail{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid #252a39}
+.detail:last-child{border-bottom:0;padding-bottom:0}
+.key{font-size:12px;color:#929bb0}.value{font-size:13px;font-weight:750;text-align:right;overflow-wrap:anywhere}
+.actions{display:flex;gap:9px;padding:0 20px 20px}
+.secondary{background:#202637;border:1px solid #343c51;color:#eef1fa;padding:12px 14px;flex:1;font-size:13px}
+.foot{text-align:center;font-size:11px;color:#727c91;margin:17px 0 0;line-height:1.5}
+@media(max-width:420px){.panel{padding:16px}.searchrow{flex-direction:column}button{min-height:48px}.avatar{width:132px;height:132px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="brand"><div class="logo">R</div> ROBLOX TOOLKIT</div>
+  <h1>Roblox <span>Finder</span></h1>
+  <p class="subtitle">Look up a Roblox player by username and reveal their display name, avatar, and user ID.</p>
+  <section class="panel">
+    <form id="lookupForm">
+      <label for="usernameInput">Roblox username</label>
+      <div class="searchrow">
+        <input id="usernameInput" name="username" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Enter a username..." maxlength="20" required>
+        <button id="searchBtn" type="submit">Find player ↗</button>
+      </div>
+      <p class="hint">Use the account username, not the display name. No password needed.</p>
+    </form>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+    <section id="result" class="result" aria-live="polite">
+      <div class="resulttop">
+        <img id="avatar" class="avatar" alt="Roblox avatar" src="">
+        <div id="displayName" class="displayname"></div>
+        <p id="handle" class="username"></p>
+        <span class="pill">ROBLOX PLAYER</span>
+      </div>
+      <div class="details">
+        <div class="detail"><span class="key">Username</span><span id="usernameValue" class="value"></span></div>
+        <div class="detail"><span class="key">Display name</span><span id="displayValue" class="value"></span></div>
+        <div class="detail"><span class="key">User ID</span><span id="idValue" class="value"></span></div>
+      </div>
+      <div class="actions">
+        <button id="copyBtn" type="button" class="secondary">Copy user ID</button>
+        <button id="profileBtn" type="button" class="secondary">Open profile ↗</button>
+      </div>
+    </section>
+  </section>
+  <p class="foot">Uses public Roblox account and avatar information. This page never asks for your Roblox password.</p>
+</main>
+<script>
+const form = document.getElementById('lookupForm');
+const input = document.getElementById('usernameInput');
+const button = document.getElementById('searchBtn');
+const statusBox = document.getElementById('status');
+const result = document.getElementById('result');
+let currentUserId = null;
+
+function showStatus(message, isError=false) {
+  statusBox.textContent = message;
+  statusBox.className = 'status show' + (isError ? ' error' : '');
+}
+function hideStatus() { statusBox.className = 'status'; }
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const username = input.value.trim();
+  if (!username) return;
+  result.classList.remove('show');
+  hideStatus();
+  button.disabled = true;
+  button.textContent = 'Searching…';
+  try {
+    const response = await fetch('/.netlify/functions/player', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({username})
+    });
+    if (!response.ok) throw new Error('The Roblox lookup service returned error ' + response.status + '. Try again later.');
+    const data = await response.json();
+    const user = data.data && data.data[0];
+    if (!user) {
+      showStatus('No account found with that username. Check the spelling and try again.', true);
+      return;
+    }
+    currentUserId = user.id;
+    document.getElementById('displayName').textContent = user.displayName || user.name;
+    document.getElementById('handle').textContent = '@' + user.name;
+    document.getElementById('usernameValue').textContent = user.name;
+    document.getElementById('displayValue').textContent = user.displayName || user.name;
+    document.getElementById('idValue').textContent = String(user.id);
+    const avatar = document.getElementById('avatar');
+    avatar.alt = (user.displayName || user.name) + "'s Roblox avatar";
+    avatar.onerror = () => {
+      avatar.removeAttribute('src');
+      avatar.alt = 'Avatar could not be loaded';
+    };
+
+    // The thumbnail endpoint returns JSON, so fetch it and use its imageUrl.
+    try {
+      const thumbResponse = await fetch(
+        '/.netlify/functions/player?avatarUserId=' + encodeURIComponent(user.id)
+      );
+      if (thumbResponse.ok) {
+        const thumbData = await thumbResponse.json();
+        const imageUrl = thumbData.data && thumbData.data[0] && thumbData.data[0].imageUrl;
+        if (imageUrl) avatar.src = imageUrl;
+        else avatar.removeAttribute('src');
+      } else {
+        avatar.removeAttribute('src');
+      }
+    } catch {
+      avatar.removeAttribute('src');
+    }
+
+    result.classList.add('show');
+    hideStatus();
+  } catch (error) {
+    showStatus((error instanceof TypeError ? 'The browser could not connect to the lookup service. Check your internet connection; if you opened this as a local file, try uploading it to Netlify and opening the website URL.' : (error.message || 'Something went wrong. Try again.')), true);
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Find player ↗';
+  }
+});
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  if (!currentUserId) return;
+  const copyBtn = document.getElementById('copyBtn');
+  try {
+    await navigator.clipboard.writeText(String(currentUserId));
+    copyBtn.textContent = 'Copied!';
+    setTimeout(() => copyBtn.textContent = 'Copy user ID', 1400);
+  } catch {
+    showStatus('Your browser blocked clipboard access. You can select and copy the User ID above.');
+  }
+});
+document.getElementById('profileBtn').addEventListener('click', () => {
+  if (currentUserId) window.open('https://www.roblox.com/users/' + currentUserId + '/profile', '_blank', 'noopener,noreferrer');
+});
+</script>
+</body>
+</html>
